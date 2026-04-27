@@ -20,21 +20,20 @@ The output is available on uo_out[3:0].
 
 ## How to test
 
-Go to the test directory:
+Go to the test folder:
 
 cd test
 
-Run the simulation:
+Run simulation:
 
 make
-Expected behavior:
-Counter decreases: 15 → 14 → 13 → ... → 0 → 15
-Stops changing when ui_in[0] = 0
+Expected result:
+Counter counts: 15 → 14 → ... → 0 → 15
+Stops when ui_in[0] = 0
 
 View waveform:
 
 gtkwave tb.vcd
-
 ## External hardware
 
 no external hardware used in your project (e.g. PMOD, LED display, etc), if any
