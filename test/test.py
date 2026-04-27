@@ -4,14 +4,18 @@ from cocotb.triggers import RisingEdge, Timer
 @cocotb.test()
 async def test_downcounter(dut):
 
-    # Init
+    # -------------------------
+    # Initialization
+    # -------------------------
     dut.ui_in.value = 0
     dut.uio_in.value = 0
     dut.ena.value = 1
     dut.clk.value = 0
     dut.rst_n.value = 0
 
-    # Clock
+    # -------------------------
+    # Clock generator
+    # -------------------------
     async def clock():
         while True:
             dut.clk.value = 0
@@ -21,14 +25,18 @@ async def test_downcounter(dut):
 
     cocotb.start_soon(clock())
 
-    # Reset release
+    # -------------------------
+    # Reset
+    # -------------------------
     await Timer(20, units="ns")
     dut.rst_n.value = 1
 
     # Enable counter
     dut.ui_in.value = 1
 
-    # Stabilize
+    # -------------------------
+    # Stabilization
+    # -------------------------
     for _ in range(3):
         await RisingEdge(dut.clk)
 
@@ -36,29 +44,45 @@ async def test_downcounter(dut):
     await Timer(1, units="ns")
 
     prev = dut.uo_out.value.integer & 0xF
-    print(f"Initial = {prev}")
+    print(f"Initial value = {prev}")
 
-    # Check decrement
+    # -------------------------
+    # Check decrement behavior
+    # -------------------------
     for i in range(10):
         await RisingEdge(dut.clk)
-        await Timer(1, units="ns")
+        await Timer(1, units="ns")   # 🔥 important
 
         curr = dut.uo_out.value.integer & 0xF
         expected = (prev - 1) % 16
 
         print(f"Cycle {i}: prev={prev}, curr={curr}, expected={expected}")
 
-        assert curr == expected, f"Mismatch at cycle {i}"
+        if curr != expected:
+            print("❌ ERROR detected")
+            assert False
 
         prev = curr
 
+    # -------------------------
     # Disable check
+    # -------------------------
     dut.ui_in.value = 0
-    hold = dut.uo_out.value.integer & 0xF
+    await RisingEdge(dut.clk)
+    await Timer(1, units="ns")
 
-    for _ in range(3):
+    hold = dut.uo_out.value.integer & 0xF
+    print(f"Hold value = {hold}")
+
+    for i in range(3):
         await RisingEdge(dut.clk)
+        await Timer(1, units="ns")
+
         curr = dut.uo_out.value.integer & 0xF
-        assert curr == hold
+        print(f"Hold check {i}: curr={curr}, expected={hold}")
+
+        if curr != hold:
+            print("❌ Counter changed when disabled")
+            assert False
 
     print("PASS ✅")
