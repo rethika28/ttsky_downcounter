@@ -9,12 +9,32 @@ You can also include images in this folder and reference them in the markdown. E
 
 ## How it works
 
-Explain how your project works
+This project implements a 4-bit down counter.
+
+The counter starts at 15 (1111) after reset.
+On every rising edge of the clock:
+If ena = 1 and ui_in[0] = 1, the counter decrements by 1.
+If ui_in[0] = 0, the counter holds its value.
+When the counter reaches 0, it wraps back to 15.
+The output is available on uo_out[3:0].
 
 ## How to test
 
-Explain how to use your project
+Go to the test directory:
+
+cd test
+
+Run the simulation:
+
+make
+Expected behavior:
+Counter decreases: 15 → 14 → 13 → ... → 0 → 15
+Stops changing when ui_in[0] = 0
+
+View waveform:
+
+gtkwave tb.vcd
 
 ## External hardware
 
-List external hardware used in your project (e.g. PMOD, LED display, etc), if any
+no external hardware used in your project (e.g. PMOD, LED display, etc), if any
