@@ -11,21 +11,22 @@ module tt_um_downcounter (
     input  wire       rst_n
 );
 
-    wire en = ui_in[0];   // enable from input
+    wire en = ui_in[0];   // enable bit
 
     reg [3:0] count;
 
-    // Down counter
+    // Down counter logic
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n)
-            count <= 4'd15;          // start from max
+            count <= 4'd15;             // start from 15
         else if (ena && en)
-            count <= count - 1;      // decrement
+            count <= count - 1;         // decrement
     end
 
-    // Output
+    // Output mapping
     assign uo_out = {4'b0000, count};
 
+    // Unused pins
     assign uio_out = 8'b0;
     assign uio_oe  = 8'b0;
 
